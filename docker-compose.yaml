@@ -1,0 +1,28 @@
+################################################################################
+# tubi-for-channels
+################################################################################
+# docker-compose -f docker-compose.yml up -d
+################################################################################
+# GitHub home for this project with setup instructions: https://github.com/jgomez177/tubi-for-channels
+# Docker container home for this project: https://ghcr.io/jgomez177/tubi-for-channels
+################################################################################
+services:
+  tubi-for-channels:
+    container_name: tubi-for-channels
+    image: ghcr.io/jgomez177/tubi-for-channels:${TAG}
+    restart: unless-stopped
+    environment:
+      - TUBI_PORT=${TUBI_PORT} # Change the port this container uses internally.
+      - TUBI_USER=${TUBI_USER} # Optional variable to sign into Tubi Account.
+      - TUBI_PASS=${TUBI_PASS} # Optional variable to sign into Tubi Account.
+    networks:
+      - traefik-net
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.tubi-m3u.rule=Host(`docker01.home.kb9kld.org`) && (PathPrefix(`/tubi/`))"
+      - "traefik.http.routers.tubi-m3u.middlewares=tubi-m3u"
+      - "traefik.http.middlewares.tubi-m3u.stripprefix.prefixes=/tubi"
+      - "traefik.http.middlewares.tubi-m3u.stripprefix.forceSlash=false"
+networks:
+  traefik-net:
+    external: true
